@@ -31,22 +31,26 @@ int loc=0;
 float ms=1.0;
 int[] chaddr = new int[18];
 int[] chocpy = new int[18];
+int[] chtype = new int[18];
 int[] indata = new int[32];
 
 void setup() {
   surface.setResizable(true);
   size(270, 640);
-
+  changeWindowSize((int)(270*0.69), (int)(640*0.69));
   background(102);
   for (int i = 0; i < 18; i++) {
-    chocpy[i] = FALSE;
+    chtype[i] = FALSE;
   }
   if (headview) {
-    chocpy[8] = FAIL;
-    chocpy[17] = FAIL;
+    chtype[8] = FAIL;
+    chtype[17] = FAIL;
   } else {
-    chocpy[0] = FAIL;
-    chocpy[9] = FAIL;
+    chtype[0] = FAIL;
+    chtype[9] = FAIL;
+  }
+  for (int i = 0; i < 18; i++) {
+    chocpy[i] = chtype[i];
   }
   for (int i= 0; i < 3; i++) {
     drawtable(85, 8+i*180);
@@ -56,14 +60,20 @@ void setup() {
     println (Serial.list()[i]);
   }
   setchair();
-  selport = new Serial(this, Serial.list()[0], 115200);
+  selport = new Serial(this, Serial.list()[2], 115200);
 }
 
 void keyPressed() {
   if (key=='1') {
-    changeWindowSize(270, 640);
+    changeWindowSize((int)(270*0.5), (int)(640*0.5));
   }
   if (key=='2') {
+    changeWindowSize((int)(270*0.69), (int)(640*0.69));
+  }
+  if (key=='3') {
+    changeWindowSize(270, 640);
+  }
+  if (key=='4') {
     changeWindowSize((int)(270*1.5), (int)(640*1.5));
   }
 }
@@ -109,7 +119,7 @@ void serialEvent(Serial p) {
       }
       if (f >= 0) {
         if (indata[loc-3] == 0) {
-          chocpy[f] = FALSE;
+          chocpy[f] = chtype[f];
           println("STAND", f);
         } else {
           chocpy[f] = TRUE;
