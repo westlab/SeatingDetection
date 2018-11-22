@@ -29,9 +29,9 @@ int FALSE=0;  // STAND
 int inbyte;
 int loc=0;
 float ms=1.0;
-int[] chaddr = new int[18];
-int[] chocpy = new int[18];
-int[] chtype = new int[18];
+int[] chaddr = new int[19];
+int[] chocpy = new int[19];
+int[] chtype = new int[19];
 int[] indata = new int[32];
 
 void setup() {
@@ -42,6 +42,7 @@ void setup() {
   for (int i = 0; i < 18; i++) {
     chtype[i] = FALSE;
   }
+/*
   if (headview) {
     chtype[8] = FAIL;
     chtype[17] = FAIL;
@@ -49,6 +50,7 @@ void setup() {
     chtype[0] = FAIL;
     chtype[9] = FAIL;
   }
+  */
   for (int i = 0; i < 18; i++) {
     chocpy[i] = chtype[i];
   }
@@ -88,13 +90,21 @@ void draw() throws IllegalArgumentException {
   fill(#EEEEEE);
   text( width + ", " + height + ", " + ms, 0, 10 );
   if (headview) {
-    drawscreen(10, 600);
+    if(chocpy[18] != 0){
+      drawscreen(10, 600, true);
+    }else{
+      drawscreen(10, 600, false);
+    }
     for (int i= 0; i < 3; i++) {
       drawtable(85, 8+i*180);
     }
     drawchairarray(10, 10);
   } else {
-    drawscreen(10, 20);
+    if(chocpy[18] != 0){
+      drawscreen(10, 20, true);
+    }else{
+      drawscreen(10, 20, false);
+    }
     for (int i= 0; i < 3; i++) {
       drawtable(85, 98+i*180);
     }
@@ -111,7 +121,8 @@ void serialEvent(Serial p) {
       (indata[loc-5] == 0x53) &&
       (indata[loc-6] == 0x24)) {
       int f = -1;
-      for (int i=0; i < 18; i++) {
+      println("RECV", hex(indata[loc-4]));
+      for (int i=0; i < 19; i++) {
         if (chaddr[i] == indata[loc-4]) {
           f = i;
           break;
@@ -120,10 +131,10 @@ void serialEvent(Serial p) {
       if (f >= 0) {
         if (indata[loc-3] == 0) {
           chocpy[f] = chtype[f];
-          println("STAND", f);
+          println("STAND", f, " " , hex(indata[loc-4]));
         } else {
           chocpy[f] = TRUE;
-          println("SEAT", f);
+          println("SEAT", f, " " , hex(indata[loc-4]));
         }
         loc = 0;
       }
@@ -143,8 +154,13 @@ void drawchairarray(int x, int y) {
   }
 }
 
-void drawscreen(int x, int y) {
-  color cscreen = #FFFFFF;
+void drawscreen(int x, int y, boolean f) {
+  color cscreen;
+  if(f){
+    cscreen = #FF0000;
+  }else{
+    cscreen = #FFFFFF;
+  }
   int screenx = 250;
   int screeny = 10;
   fill(cscreen);
@@ -185,7 +201,7 @@ void setchair() {
     chaddr[5] = 0x5D;
     chaddr[6] = 0x37;
     chaddr[7] = 0x46;
-    chaddr[8] = 0xFF;
+    chaddr[8] = 0x27;
     chaddr[9] = 0x70;
     chaddr[10] = 0x48;
     chaddr[11] = 0x35;
@@ -194,7 +210,8 @@ void setchair() {
     chaddr[14] = 0x4F;
     chaddr[15] = 0x05;
     chaddr[16] = 0x3D;
-    chaddr[17] = 0x60;
+    chaddr[17] = 0x58;
+    chaddr[18] = 0x60;
   } else {
     if (headview) {
       chaddr[9] = 0x50;
@@ -205,7 +222,7 @@ void setchair() {
       chaddr[14] = 0x5D;
       chaddr[15] = 0x37;
       chaddr[16] = 0x46;
-      chaddr[17] = 0xFF;
+      chaddr[17] = 0x27;
       chaddr[0] = 0x70;
       chaddr[1] = 0x48;
       chaddr[2] = 0x35;
@@ -214,7 +231,8 @@ void setchair() {
       chaddr[5] = 0x4F;
       chaddr[6] = 0x05;
       chaddr[7] = 0x3D;
-      chaddr[8] = 0x60;
+      chaddr[8] = 0x58;
+      chaddr[18] = 0x60;
     } else {
       chaddr[17] = 0x50;
       chaddr[16] = 0x44;
@@ -224,7 +242,7 @@ void setchair() {
       chaddr[12] = 0x5D;
       chaddr[11] = 0x37;
       chaddr[10] = 0x46;
-      chaddr[9] = 0xFF;
+      chaddr[9] = 0x27;
       chaddr[8] = 0x70;
       chaddr[7] = 0x48;
       chaddr[6] = 0x35;
@@ -233,7 +251,8 @@ void setchair() {
       chaddr[3] = 0x4F;
       chaddr[2] = 0x05;
       chaddr[1] = 0x3D;
-      chaddr[0] = 0x60;
+      chaddr[0] = 0x58;
+      chaddr[18] = 0x60;
     }
   }
 }
